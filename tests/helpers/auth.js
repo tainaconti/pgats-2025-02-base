@@ -5,15 +5,13 @@ async function registerAndLogin(app, { name = 'Taina QA', email, password = '123
   const unique = Date.now();
   const safeEmail = email || `taina_${unique}@email.com`;
 
-  // registro
   const reg = await request(app)
     .post('/api/users/register')
     .send({ name, email: safeEmail, password })
     .expect(201);
 
-  expect(reg.body).to.have.property('email', safeEmail);
+  expect(reg.body).to.have.nested.property('user.email', safeEmail);
 
-  // login
   const login = await request(app)
     .post('/api/users/login')
     .send({ email: safeEmail, password })

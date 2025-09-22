@@ -3,19 +3,19 @@ const request = require('supertest');
 const path = require('path');
 
 const app = require(path.join(process.cwd(), 'rest', 'app.js'));
-
 const unique = () => `${Date.now()}_${Math.floor(Math.random()*1000)}`;
 
 describe('REST - Auth', () => {
   it('registra usuário com sucesso', async () => {
     const email = `qa_${unique()}@email.com`;
 
-    const res = await request(app)
+    const reg = await request(app)
       .post('/api/users/register')
       .send({ name: 'QA', email, password: '123456' })
       .expect(201);
 
-    expect(res.body).to.include({ email, name: 'QA' });
+    expect(reg.body).to.have.nested.property('user.email', email);
+    expect(reg.body).to.have.nested.property('user.name', 'QA');
   });
 
   it('loga usuário com sucesso', async () => {
@@ -47,6 +47,6 @@ describe('REST - Auth', () => {
       .send({ email, password: 'errada' })
       .expect(401);
 
-    expect(login.body).to.have.property('message');
+    expect(login.body).to.have.property('error', 'Credenciais inválidas');
   });
 });

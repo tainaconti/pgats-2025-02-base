@@ -4,9 +4,13 @@ on:
   push:
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   test:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -15,19 +19,38 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
+          cache: 'npm'     # usa package-lock.json pra cache
+
+      - name: Verify lockfile (recomendado para usar npm ci)
+        run: |
+          if [ ! -f package-lock.json ]; then
+            echo "::warning ::package-lock.json não encontrado. Vou usar npm install no lugar de npm ci."
+          fi
 
       - name: Install
-        run: npm ci || npm install
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm install
+          fi
+
+      # opcional: garante que dependências de teste estão presentes (debug fácil)
+      - name: Sanity check dev deps
+        run: |
+          npx cross-env --version
+          npx nyc --version
+          npx mocha --version
 
       - name: Run tests (REST + GraphQL)
         env:
           NODE_ENV: test
           JWT_SECRET: testsecret
+          CI: true
         run: npm test
 
       - name: Coverage report
-        if: always()
+        if: always() && hashFiles('coverage/lcov.info') != ''
         uses: actions/upload-artifact@v4
         with:
           name: coverage
