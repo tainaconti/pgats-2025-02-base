@@ -1,0 +1,7 @@
+{
+    "all": false,
+    "reporter": ["text-summary", "lcov"],
+    "include": ["rest/**/*.js", "graphql/**/*.js", "src/**/*.js"],
+    "exclude": ["**/server.js", "tests/**"]
+  }
+  

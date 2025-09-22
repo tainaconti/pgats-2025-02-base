@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "cross-env NODE_ENV=test JWT_SECRET=testsecret nyc mocha \"tests/**/*.spec.js\" --reporter spec --timeout 10000",
+    "test:rest": "cross-env NODE_ENV=test JWT_SECRET=testsecret nyc mocha \"tests/rest/**/*.spec.js\" --reporter spec --timeout 10000",
+    "test:graphql": "cross-env NODE_ENV=test JWT_SECRET=testsecret nyc mocha \"tests/graphql/**/*.spec.js\" --reporter spec --timeout 10000"
   },
   "repository": {
     "type": "git",
